@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stovetop math - calculators</title>
+<style>
+  :root { --accent: #9a8a4f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Georgia, 'Times New Roman', serif; background: #faf8f3; color: #272420; line-height: 1.55; }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; color: var(--accent); }
+  .lede { margin: 0 0 28px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  section { background: #fff; border: 1px solid #e4ddcc; border-radius: 8px; padding: 20px 22px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  .hint { font-size: 0.9rem; color: #6d6650; margin: 0 0 14px; }
+  label { display: block; font-size: 0.9rem; margin: 10px 0 3px; }
+  input { width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid #cec5a9; border-radius: 5px; font-family: inherit; }
+  button { margin-top: 16px; width: 100%; padding: 11px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  button:hover { filter: brightness(1.12); }
+  .out { margin-top: 14px; font-size: 1rem; min-height: 1.4em; }
+  .out.err { color: #a32222; }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; font-size: 0.85rem; color: #8a8578; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Stovetop math</h1>
+  <p class="lede">Minutes to a boil, the lid's honest worth, and kWh a year. Exact arithmetic, every borrowed number labeled.</p>
+  <div class="grid">
+    <section>
+      <h2>Boil plan</h2>
+      <p class="hint">Liters and watts become minutes.</p>
+      <label for="b-l">Water (liters)</label>
+      <input id="b-l" type="number" value="1.5" min="0" step="0.1">
+      <label for="b-w">Ring power (W)</label>
+      <input id="b-w" type="number" value="2000" min="0" step="100">
+      <label for="b-t">Start temperature (°C)</label>
+      <input id="b-t" type="number" value="20" min="0" step="1">
+      <button id="b-go">Time the boil</button>
+      <div class="out" id="b-out"></div>
+    </section>
+    <section>
+      <h2>Lid plan</h2>
+      <p class="hint">The lid becomes minutes saved.</p>
+      <label for="l-l">Water (liters)</label>
+      <input id="l-l" type="number" value="1.5" min="0" step="0.1">
+      <label for="l-w">Ring power (W)</label>
+      <input id="l-w" type="number" value="2000" min="0" step="100">
+      <label for="l-t">Start temperature (°C)</label>
+      <input id="l-t" type="number" value="20" min="0" step="1">
+      <button id="l-go">Weigh the lid</button>
+      <div class="out" id="l-out"></div>
+    </section>
+    <section>
+      <h2>Year plan</h2>
+      <p class="hint">A habit becomes kWh and cost.</p>
+      <label for="y-n">Boils a week</label>
+      <input id="y-n" type="number" value="5" min="0" step="1">
+      <label for="y-l">Water (liters)</label>
+      <input id="y-l" type="number" value="1.5" min="0" step="0.1">
+      <label for="y-w">Ring power (W)</label>
+      <input id="y-w" type="number" value="2000" min="0" step="100">
+      <label for="y-t">Start temperature (°C)</label>
+      <input id="y-t" type="number" value="20" min="0" step="1">
+      <label for="y-r">Tariff (per kWh)</label>
+      <input id="y-r" type="number" value="0.15" min="0" step="0.01">
+      <button id="y-go">Count the year</button>
+      <div class="out" id="y-out"></div>
+    </section>
+  </div>
+</main>
+<footer>Built by the app factory. <a href="index.html">About</a> &middot; <a href="https://github.com/iLanis-agent/stovetopmath">Source</a></footer>
+<script src="engine.js"></script>
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value); }
+function show(id, r, render){
+  var el = document.getElementById(id);
+  if (r.error) { el.textContent = r.error; el.classList.add('err'); }
+  else { el.textContent = render(r); el.classList.remove('err'); }
+}
+document.getElementById('b-go').addEventListener('click', function(){
+  show('b-out', StovetopMath.boilPlan(num('b-l'),num('b-w'),num('b-t')), StovetopMath.renderBoil);
+});
+document.getElementById('l-go').addEventListener('click', function(){
+  show('l-out', StovetopMath.lidPlan(num('l-l'),num('l-w'),num('l-t')), StovetopMath.renderLid);
+});
+document.getElementById('y-go').addEventListener('click', function(){
+  show('y-out', StovetopMath.yearPlan(num('y-n'),num('y-l'),num('y-w'),num('y-t'),num('y-r')), StovetopMath.renderYear);
+});
+</script>
+</body>
+</html>
